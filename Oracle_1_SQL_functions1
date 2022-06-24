@@ -1,0 +1,125 @@
+-- Chapter 2. SQL 단일행 함수
+
+--p6 INITCAP() 함수
+SELECT ename , INITCAP(ename) "INITCAP"
+FROM emp
+WHERE deptno = 10;
+
+SELECT name, INITCAP(name) "INITCAP"
+FROM professor
+WHERE deptno =101;
+
+--p7 LOWER(), UPPER()
+SELECT ename, LOWER(ename) "LOWER", UPPER(ename) "UPPER"
+FROM emp
+WHERE deptno = 10;
+
+--p8 LENGTH / LENGTHB
+SELECT ename, LENGTH(ename) "LENGTH", LENGTHB(ename) "LENGTH"
+FROM emp
+WHERE deptno = 20;
+
+SELECT '서진수' "NAME", LENGTH('서진수') "LENGTH", LENGTHB('서진수') "LENGTHB"
+FROM DUAL;
+
+SET verify OFF
+SELECT ename, LENGTH(ename)
+FROM emp
+WHERE LENGTH(ename) > LENGTH('&ename');
+--enter value for ename : smith
+
+--p10 CONCAT()
+SELECT CONCAT(ename, job)
+FROM emp
+WHERE deptno=10;
+
+--p11 SUBSTR()
+COL "3,2" FOR a6
+COL "-3,2" FOR a6
+COL "-3,4" FOR a6
+SELECT SUBSTR('abcde', 3,2) "3,2",
+       SUBSTR('abcde', -3,2) "-3,2",
+       SUBSTR('abcde', -3,4) "-3,4"
+FROM dual;
+
+SELECT name, SUBSTR(jumin, 3,4) "Birthday",
+             SUBSTR(jumin, 3,4)-1 "Birthday - 1"
+FROM student
+WHERE deptno1 = 101;
+
+SELECT '서진수' "NAME", SUBSTR('서진수',1,2) "SUBSTR",
+                       SUBSTRB('서진수',1,3) "SUBSTAB"
+FROM dual;
+
+--P 14 INSTR()
+SELECT 'A-B-C-D', INSTR('A-B-C-D', '-', 1,3) "INSTR"
+FROM dual;
+
+SELECT 'A-B-C-D', INSTR('A-B-C-D', '-', 3,1) "INSTR"
+FROM dual;
+
+--P15
+SELECT 'A-B-C-D', INSTR('A-B-C-D', '-', -1,3) "INSTR"
+FROM dual;
+
+SELECT 'A-B-C-D', INSTR('A-B-C-D', '-', -1,3) "INSTR"
+FROM dual;
+
+SELECT 'A-B-C-D', INSTR('A-B-C-D', '-', -6,2) "INSTR"
+FROM dual;
+
+--P 16
+SELECT name, tel, INSTR(tel, ')')
+FROM student
+WHERE deptno1 = 201;
+
+SELECT name, tel, INSTR(tel, '3')
+FROM student
+WHERE deptno1 = 101;
+--P18 SUBSTR / INSTR QUIZ
+SELECT name, tel, SUBSTRB(tel,1,INSTR(tel, ')')-1)"AREA CODE"
+FROM student
+WHERE deptno1=201;
+
+--P19 LPAD()
+COL name FOR a20
+COL id FOR a10
+COL LPAD(id, 10, '*') FOR a20
+SELECT name, id, LPAD(id, 10, '*')
+FROM student
+WHERE deptno1 = 201;
+
+SELECT *
+FROM emp
+WHERE deptno=10;
+
+--P20 LPAD QUIZ
+--FUNCTION VER.
+SELECT LPAD(ename, 9, SUBSTR('123456789',1,9-LENGTH(ename)))
+FROM emp
+WHERE deptno = 10;
+--NON FUNCTION VER.
+SELECT LPAD(ename, 9, 123456789)
+FROM emp
+WHERE deptno = 10;
+
+--P21 RPAD()
+SELECT RPAD(ename, 10, '-') "RPAD"
+FROM emp
+WHERE deptno = 10;
+
+--p22 RPAD() QUIZ, LENGTH와 LENGTHB의 결과가 같음
+SELECT RPAD(ename, 9, SUBSTR('123456789',LENGTHB(ename)+1,9))
+FROM emp
+WHERE deptno = 10;
+
+--P23 LTRIM() / RTRIM()
+SELECT ename FROM emp
+WHERE deptno = 10;
+
+SELECT LTRIM(ename, 'T')
+FROM emp;
+
+SELECT RTRIM(ename, 'LER')
+FROM emp;
+
