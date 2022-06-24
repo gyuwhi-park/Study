@@ -1,0 +1,194 @@
+-- Chapter 1. SELECT 명령으로 데이터 조회
+
+SELECT ename , job FROM emp;
+
+SELECT ename || job FROM emp;
+
+SELECT ename||' ''s job is ' || job "NAME AND JOB"
+FROM emp;
+
+SELECT dname, ' it''s deptno:', deptno "DNAME AND DEPTNO"
+FROM dept;
+
+
+-- p 22, 연결 연산자 연습 문제1
+SELECT * FROM student;
+
+SELECT name||' ''s ID : '||ID ||', WEIGHT is '||WEIGHT||'Kg' "ID AND WEIGHT"
+from student;
+
+--p 23, 연결 연산자 연습 문제2
+SELECT ename||'('||job||') , '||ename||''''||job||'''' "NAME AND JOB"
+FROM emp;
+
+
+--p 24, 연결 연산자 연습 문제3
+SELECT * FROM emp;
+
+SELECT ename||'''s sal is $'||sal "Name and Sal"
+FROM emp;
+
+--p31, 비교 연산자 사용하기 - 숫자와 문자
+
+SELECT empno, ename, sal
+FROM emp
+WHERE sal >=4000;
+
+SELECT empno, ename, sal
+FROM emp
+WHERE ename >='W';
+
+--p32, 비교 연산자 사용하기 - 날자
+SELECT * FROM emp;
+
+SELECT ename, hiredate
+FROM emp;
+
+SELECT ename, hiredate
+FROM emp
+WHERE hiredate >= '81/01/23'; --81년 1월 23일 이후 고용(80년 입사자는 걸러짐)
+
+SELECT empno, ename, sal
+FROM emp
+WHERE sal BETWEEN 2000 AND 3000;
+
+SELECT empno, ename, sal
+FROM emp
+WHERE sal >=2000
+AND sal <=3000;
+
+SELECT ename FROM emp
+ORDER BY ename;
+
+SELECT ename FROM emp
+WHERE ename BETWEEN 'JAMES' AND 'MARTIN'
+ORDER BY ename;
+
+--between을 바꾼것. 상동.
+SELECT ename FROM emp
+WHERE ename >= 'JAMES'
+AND ename<= 'MARTIN'
+ORDER BY ename;
+
+SELECT empno, ename, deptno
+FROM emp
+WHERE deptno IN (10,20);
+
+--LIKE 연산자로 비슷한 것들 모두 찾기
+SELECT empno , empno, sal
+FROM emp
+WHERE sal LIKE '1%';
+
+SELECT empno, ename, sal
+FROM emp
+WHERE ename LIKE 'A%';
+
+SELECT empno, ename, hiredate
+FROM emp
+WHERE hiredate LIKE '80%';
+
+SELECT empno, ename, hiredate
+FROM emp
+WHERE hiredate LIKE '___12%';
+
+--p38 IS NULL / IS NOT NULL
+SELECT empno, ename, comm
+FROM emp
+WHERE deptno IN (20,30);
+
+SELECT empno, ename, comm
+FROM emp
+WHERE comm IS NULL;
+
+SELECT empno, ename, comm
+FROM emp
+WHERE comm IS NOT NULL;
+
+--P 40 AND / OR
+SELECT ename, hiredate,sal
+FROM emp
+WHERE hiredate > '82/01/01'
+AND sal>=1300;
+
+SELECT ename, hiredate, sal
+FROM emp
+WHERE hiredate> ' 82/01/01'
+OR sal >=1300;
+
+SELECT empno, ename, sal, comm
+FROM emp
+WHERE sal>1000 AND (comm < 1000 OR comm IS NULL);
+
+SELECT empno, ename, sal, comm
+FROM emp
+WHERE sal >1000
+AND comm> 1000 
+OR comm IS NULL;
+
+--p 42 조건을 입력받아서 조건에 맞는 값 출력
+SELECT empno, ename, sal
+FROM emp
+WHERE empno = &empno;
+--ENTER value for empno : 7902
+
+SET verify OFF
+SELECT empno , ename, sal
+FROM emp
+WHERE empno = &empno;
+--ENTER value for empno : 7902
+
+SELECT empno, ename
+FROM &table
+WHERE sal = 3000;
+--ENTER value for empno : emp
+
+--p44 sorting
+SELECT ename, sal, hiredate
+FROM emp;
+
+SELECT ename, sal, hiredate
+FROM emp
+ORDER BY sal;
+
+--p45 double sorting(deptno is Primary, sal is secondary)
+SELECT deptno, sal, ename
+FROM emp
+ORDER BY deptno ASC, sal DESC;
+
+SELECT ename, sal, hiredate
+FROM emp
+WHERE sal >1000
+ORDER BY 2, 1;
+
+--p46 집합연산자
+SELECT studno, name, deptno1, 1
+FROM student
+WHERE deptno1 = 101
+UNION
+SELECT profno, name, deptno, 2
+FROM professor
+WHERE deptno =101;
+
+SELECT studno, name, deptno1, 1
+FROM student
+WHERE deptno1 = 101
+UNION ALL
+SELECT profno, name, deptno, 2
+FROM professor
+WHERE deptno =101;
+
+SELECT studno, name
+FROM student
+WHERE deptno1 =101
+INTERSECT
+SELECT studno, name
+FROM student
+WHERE deptno2=201;
+
+SELECT empno, ename, sal
+FROM emp
+MINUS
+SELECT empno, ename, sal
+FROM emp
+WHERE sal>2500;
+
