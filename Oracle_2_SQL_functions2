@@ -1,0 +1,346 @@
+--p25, replace()
+SELECT ename, REPLACE(ename, SUBSTR(ename,1,2),'**') "REPLACE"
+FROM emp
+WHERE deptno = 10;
+
+--p26 quiz1
+SELECT ename, REPLACE(ename, SUBSTR(ename,2,2),'--') "REPLACE"
+FROM emp
+WHERE deptno = 20;
+
+--p27 quiz2
+SELECT name, jumin
+FROM student;
+
+SELECT name, jumin, REPLACE(jumin,SUBSTR(jumin,7,8),'-/-/-/-') "REPLACE"
+FROM student
+WHERE deptno1 = 101;
+
+--p28 quiz3
+SELECT name, tel, REPLACE(tel, substr(tel,5,3),'***') "REPLACE"
+FROM student
+WHERE deptno1 = 102;
+
+--p29 quiz4
+--INSTR(tel, '-')+1
+SELECT name, tel, REPLACE(tel, SUBSTR(tel, INSTR(tel, '-')+1,4),'****') "REPLACE"
+FROM student
+WHERE deptno1 = 101;
+
+--p31 ROUND()
+SELECT ROUND(987.654,2) "ROUND1",
+       ROUND(987.654,0) "ROUND2",
+       ROUND(987.654,-1) "ROUND3"
+FROM dual;
+
+--p32 TRUNC()
+SELECT TRUNC(987.654,2) "TRUNC1",
+       TRUNC(987.654,0) "TRUNC2",
+       TRUNC(987.654,-1) "TRUNC3"
+FROM dual;
+
+--p33 mod(), ceil(), floor()
+SELECT MOD(121,10) "MOD",       --121%10
+       CEIL(123.45) "CEIL",     --??보다 큰 정수
+       FLOOR(123.45) "FLOOR"    --??보다 작은 정수
+FROM dual;
+
+SET pagesize 50
+SELECT rownum "ROWNO", CEIL(rownum/3) "TEAMNO", ename
+FROM emp;
+
+--power()
+SELECT POWER(2,3) FROM dual;
+
+--p36
+SELECT SYSDATE FROM dual;
+
+ALTER SESSION SET NLS_DATE_FORMAT='RRRR-MM-DD:HH24:MI:SS';
+ALTER SESSION SET NLS_DATE_FORMAT='RRRR-MM-DD';
+
+SELECT SYSDATE FROM dual;
+
+SELECT MONTHS_BETWEEN('14/09/30', '14/08/31')
+FROM dual;
+
+SELECT MONTHS_BETWEEN('14/08/31', '14/09/30')
+FROM dual;
+
+SELECT MONTHS_BETWEEN('12/03/01', '12/02/28')
+FROM dual;
+
+SELECT MONTHS_BETWEEN('12/04/30', '12/04/01')
+FROM dual;
+
+SELECT ename, hiredate,
+       ROUND (MONTHS_BETWEEN(TO_DATE('04/05/31'), hiredate),1) "DATE1",
+       ROUND (((TO_DATE('04/05/31') - hiredate)/31),1) "DATE2"
+FROM emp
+WHERE deptno = 10;
+
+SELECT SYSDATE, ADD_MONTHS(SYSDATE,1)
+FROM dual;
+
+SELECT SYSDATE, NEXT_DAY('14/05/01', '월') FROM dual;
+
+SELECT SYSDATE, LAST_DAY(SYSDATE), LAST_DAY('14/05/01')
+FROM dual;
+
+ALTER SESSION SET NLS_DATE_FORMAT='RRRR-MM-DD:HH24:MI:SS';
+ALTER SESSION SET NLS_DATE_FORMAT='RRRR-MM-DD';
+
+SELECT SYSDATE, ROUND(SYSDATE), TRUNC(SYSDATE)
+FROM dual;
+
+--p46
+SELECT 2+'2' FROM dual;
+
+SELECT 2+'A' FROM dual;
+
+SELECT SYSDATE, TO_CHAR(SYSDATE, 'YYYY') "YYYY",
+                TO_CHAR(SYSDATE, 'RRRR') "RRRR",
+                TO_CHAR(SYSDATE, 'YY') "YY",
+                TO_CHAR(SYSDATE, 'RR') "RR",
+                TO_CHAR(SYSDATE, 'YEAR') "YEAR"
+FROM dual;
+
+SELECT SYSDATE, TO_CHAR(SYSDATE, 'MM') "MM",
+                TO_CHAR(SYSDATE, 'MON') "MON",
+                TO_CHAR(SYSDATE, 'MONTH') "MONTH"
+FROM dual;
+
+SELECT SYSDATE, TO_CHAR(SYSDATE, 'DD') "DD",
+                TO_CHAR(SYSDATE, 'DAY') "DAY",
+                TO_CHAR(SYSDATE, 'DDTH') "DDTH"
+FROM dual;
+
+SELECT SYSDATE, TO_CHAR(SYSDATE, 'RRRR-MM-DD:HH24:MI:SS')
+FROM dual;
+
+--p 53 quiz1
+--wrong
+SELECT studno, name, birthday
+FROM student
+WHERE birthday('MM') = 01;
+
+--p 54 quiz2
+SELECT empno, ename,hiredate "HIREDATE"
+FROM emp
+WHERE TO_CHAR(hiredate, 'MM') in ('01', '02', '03');
+
+--p56
+SELECT empno, ename, sal, comm,
+       TO_CHAR((sal*12)+comm, '999,999') "SALARY"
+FROM emp
+WHERE ename = 'ALLEN';
+
+SELECT name, pay, bonus,
+       TO_CHAR((pay*12)+bonus, '999,999') "TOTAL"
+FROM professor
+WHERE deptno = 201;
+
+--p58 quiz3
+SELECT empno, ename, hiredate,
+       To_CHAR((sal*12)+comm,'$999,999') "SAL",
+       To_CHAR((((sal*12)+comm)*1.15),'$999,999') "15% UP"
+FROM emp
+WHERE comm>-1;
+
+--p59
+SELECT TO_NUMBER('5') FROM dual;
+
+--61 NVL(sal, 'val') ->change null to 'val'
+SELECT ename, comm, NVL(comm,0), NVL(comm,100)
+FROM emp
+WHERE deptno = 30;
+
+--p63 quiz - NVL()
+SELECT profno, name, pay, NVL(bonus, 0) "BONUS", 
+       To_CHAR((pay*12+NVL(bonus, 0)),'999,999') "TOTAL"
+FROM professor
+WHERE deptno=201;
+
+SELECT empno, ename, sal, comm,
+       NVL2(comm, sal+comm, sal*0) "NVL2"
+FROM emp
+WHERE deptno = 30;
+
+--p65 quiz - NVL2
+SELECT empno, ename, comm, NVL2(comm, 'Exist', 'NULL') "NVL2"
+FROM emp
+WHERE deptno = 30;
+
+--p67 DECODE() **very important**
+SELECT deptno, name, DECODE(deptno, 101, 'computer Engineering') "DNAME"
+FROM professor;
+
+SELECT deptno, name, DECODE(deptno, 101, 'Computer Engineering', 'ETC') "DNAME"
+FROM professor;
+
+SELECT deptno, name, DECODE(deptno, 101, 'computer Engineering',
+                                    102, 'Multimedia Engineering',
+                                    103, 'Software Engineering',
+                                         'ETC') "DNAME"
+FROM professor;
+
+SELECT deptno, name, DECODE(deptno, 101, DECODE(name, 'Audie Murphy', 'BEST!')) "ETC"
+FROM professor;
+
+SELECT deptno, name,
+       DECODE(deptno, 101, DECODE(name, 'Audie Murphy', 'BEST!', 'GOOD!')) "ETC"
+FROM professor;
+
+SELECT deptno, name,
+       DECODE(deptno, 101, DECODE(name, 'Audie Murphy', 'BEST!', 'GOOD!'), 'N/A') "ETC"
+FROM professor;
+
+--p73 quiz
+--p11 substr() 
+SELECT name, jumin, DECODE(SUBSTR(jumin,7,1),1,'MAN','WOMAN') "Gender"
+FROM student
+WHERE deptno1=101;
+--
+SELECT name, tel, DECODE(SUBSTR(tel, 1,INSTR(tel,')',1)-1), '031', 'GYEONGGI',
+                                                            '051', 'BUSAN',
+                                                            '052', 'ULSAN',
+                                                            '055', 'GYEONGNAM',
+                                                            '02', 'SEOUL') "LOC"
+FROM student
+WHERE deptno1 = 101;
+
+SELECT name, tel, CASE(SUBSTR(tel, 1, INSTR(tel,')')-1)) WHEN '02' THEN 'SEOUL'
+                                                         WHEN '031' THEN 'GYEONGGI'
+                                                         WHEN '051' THEN 'BUSAN'
+                                                         WHEN '052' THEN 'ULSAN'
+                                                         WHEN '055' THEN 'GYEONGNAM'
+                                                         ELSE 'ETC'
+                                                         END "LOC"
+FROM student
+WHERE deptno1 = 201;
+
+--p 77 wrong input somewhere
+SELECT name, SUBSTR(jumin, 3,2) "MONTH",
+       CASE WHEN SUBSTR(jumin,3,2) BETWEEN '01' AND '03' THEN '1/4'
+            WHEN SUBSTR(jumin,3,2) BETWEEN '04' AND '06' THEN '2/4'
+            WHEN SUBSTR(jumin,3,2) BETWEEN '07' AND '09' THEN '3/4'
+            WHEN SUBSTR(jumin,3,2) BETWEEN '10' AND '12' THEN '4/4'
+            END "Quarter"
+FROM student;
+
+SELECT empno, ename, sal,
+       CASE WHEN sal BETWEEN '1' AND '1000' THEN 'Level 1'
+            WHEN sal BETWEEN '1001' AND '2000' THEN 'Level 2'
+            WHEN sal BETWEEN '2001' AND '3000' THEN 'Level 3'
+            WHEN sal BETWEEN '3001' AND '4000' THEN 'Level 4'
+            WHEN sal BETWEEN '4001' AND '99999' THEN 'Level 5'
+            END "LEVEL"
+FROM emp;
+
+--p79 정규식
+SELECT * FROM t_reg;
+
+--p81 REGEXP_LIKE()
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[a-z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[A-Z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[a-zA-Z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[a-z] ') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[a-z] [0-9]') ;
+
+--space -> [:space:]
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[[:space:]]') ;
+
+-- [A-Z]{n} -> n개의 대문자가 연속인 경우 출력
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[A-Z]{3}') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[A-Z][0-9]{3}') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[0-9][A-Z]{3}') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[A-Z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[[:upper:]]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[[:lower:]]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'^[A-Za-z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'^[0-9A-Z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'^[0-9a-z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'^[0-9]|^[a-z]') ;
+
+SELECT name, id
+FROM student
+WHERE REGEXP_LIKE(id, '^M(a|o)');
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[a-zA-Z]$') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[[:alpha:]]$') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'^[^a-z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'^[^0-9]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'^[^0-9a-z]') ;
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIke(text,'[^a-z]') ;
+
+SELECT * FROM t_reg
+WHERE NOT REGEXP_LIke(text,'[a-z]') ;
+
+SELECT name, tel
+FROM student
+WHERE REGEXP_LIKE(tel, '^[0-9]{2}\)[0-9]{4}');
+
+SELECT name, id
+FROM student
+WHERE REGEXP_LIke(id, '...r.') ;
+
+--p97
+SELECT * FROM t_reg2;
+
+--각 자리가 ( 1 || 0 || . )인 9자리 + 1 인 값을 검색함. 111111111.00 이런 패턴도 검색가능함.
+--[10]{2}\.[10]{2}\.[10]{2}\.[1] 이렇게 하면 두자리 후 점으로 반드시 끊기는 경우만 검색.
+SELECT * FROM t_reg2
+WHERE REGEXP_LIKE(ip,'^[10.]{9}[1]');
+
+SELECT * FROM t_reg
+WHERE NOT REGEXP_LIKE(text, '[a-zA-Z]');
+
+--P100 특수문자 찾기
+SELECT * FROM t_reg
+WHERE REGEXP_LIKE(text, '!');
+
+SELECT * FROM t_reg
+WHERE REGEXP_LIKE(text, '\?');
+
+--P103 ?가 없는 행만 출력
+SELECT * FROM t_reg
+WHERE NOT REGEXP_LIKE(text, '\?');
