@@ -1,0 +1,218 @@
+--ch3 복수행 함수
+SELECT deptno, job, AVG(NVL(sal, 0)) AVG_SAL
+FROM emp
+GROUP BY deptno, job
+ORDER BY 1,2;
+
+SELECT deptno, AVG(NVL(sal, 0))
+FROM emp
+WHERE deptno >10
+GROUP BY deptno
+HAVING AVG(NVL(sal, 0)) > 2000;
+
+SELECT deptno, position, COUNT(*), SUM(PAY)
+FROM professor
+GROUP BY position, ROLLUP(deptno);
+
+SELECT deptno, position, COUNT(*), SUM(PAY)
+FROM professor
+GROUP BY deptno, ROLLUP(position);
+
+CREATE TABLE professor2
+AS SELECT deptno, position, pay
+FROM professor;
+
+SELECT * FROM professor2;
+
+INSERT INTO professor2 VALUES(101, 'instuctor' ,100);
+
+INSERT INTO professor2 VALUES(101, 'a full professor', 100);
+
+INSERT INTO professor2 VALUES(101, 'assistant professor', 100);
+
+COMMIT;
+
+SELECT * FROM professor2
+ORDER BY deptno, position;
+
+SELECT deptno, position, SUM(PAY)
+FROM professor2
+GROUP BY deptno, ROLLUP(position);
+
+--p 25
+
+SELECT deptno, NULL JOB, ROUND(AVG(sal),1) AVG_SAL, COUNT(*) CNT_EMP
+FROM emp
+GROUP BY deptno
+UNION ALL
+SELECT NULL deptno, job, ROUND(AVG(sal),1) AVG_SAL, COUNT(*) CNT_EMP
+FROM emp
+GROUP BY job
+UNION ALL
+SELECT deptno, job, ROUND(AVG(sal),1) AVG_SAL, COUNT(*) CNT_EMP
+FROM emp
+GROUP BY deptno, job
+UNION ALL
+SELECT NULL deptno, NULL job, ROUND(AVG(sal),1) AVG_SAL, COUNT(*) CNT_EMP
+FROM emp
+ORDER BY deptno, job;
+
+SELECT  grade, deptno1,
+        COUNT(*), SUM(height),
+        SUM(weight)
+FROM student
+GROUP BY GROUPING SETS(grade, deptno1);
+
+--LISTAGG()
+SELECT deptno,LISTAGG(ename, ' -> ') WITHIN GROUP(ORDER BY hiredate) "LISTAGG"
+FROM emp
+GROUP BY deptno;
+
+--PIVOT()
+SELECT  DECODE(day, 'SUN', dayno) SUN,
+        DECODE(day, 'MON', dayno) MON,
+        DECODE(day, 'TUE', dayno) TUE,
+        DECODE(day, 'WED', dayno) WED,
+        DECODE(day, 'THU', dayno) THU,
+        DECODE(day, 'FRI', dayno) FRI,
+        DECODE(day, 'SAT', dayno) SAT
+FROM cal;
+
+SELECT  MAX(DECODE(day, 'SUN', dayno)) SUN,
+        MAX(DECODE(day, 'MON', dayno)) MON,
+        MAX(DECODE(day, 'TUE', dayno)) TUE,
+        MAX(DECODE(day, 'WED', dayno)) WED,
+        MAX(DECODE(day, 'THU', dayno)) THU,
+        MAX(DECODE(day, 'FRI', dayno)) FRI,
+        MAX(DECODE(day, 'SAT', dayno)) SAT
+FROM cal
+GROUP BY weekno;
+
+SELECT  MAX(DECODE(day, 'SUN', dayno)) SUN,
+        MAX(DECODE(day, 'MON', dayno)) MON,
+        MAX(DECODE(day, 'TUE', dayno)) TUE,
+        MAX(DECODE(day, 'WED', dayno)) WED,
+        MAX(DECODE(day, 'THU', dayno)) THU,
+        MAX(DECODE(day, 'FRI', dayno)) FRI,
+        MAX(DECODE(day, 'SAT', dayno)) SAT
+FROM cal
+GROUP BY weekno
+ORDER BY weekno;
+
+COL week FOR a4
+SELECT * FROM (SELECT weekno "WEEK", day, dayno FROM cal)
+PIVOT
+(   MAX(dayno) FOR day IN(  'SUN' AS "SUN",
+                            'MON' AS "MON",
+                            'TUE' AS "TUE",
+                            'WED' AS "WED",
+                            'THU' AS "THU",
+                            'FRI' AS "FRI",
+                            'SAT' AS "SAT"  ))
+ORDER BY "WEEK";
+
+--45P
+CREATE TABLE upivot
+AS SELECT * FROM (SELECT deptno, job, empno FROM emp)
+PIVOT
+    (
+        COUNT(empno)
+        FOR job IN (    'CLERK' AS "CLERK",
+                        'MANAGER' AS "MANAGER",
+                        'PRESIDENT' AS "PRESIDENT",
+                        'ANALYST' AS "ANALYST",
+                        'SALESMAN' AS "SALESMAN"));
+                        
+SELECT * FROM upivot;
+
+SELECT * FROM upivot
+UNPIVOT(
+        empno FOR job IN (CLERK, MANAGER, PRESIDENT, ANALYST, SALESMAN));
+        
+--46P LAG()
+SELECT ename, hiredate, sal,
+        LAG(sal, 1,0) OVER (ORDER BY hiredate) "LAG"
+FROM emp;
+
+SELECT ename, hiredate, sal,
+        LAG(sal, 3,2) OVER (ORDER BY hiredate) LAG
+FROM emp;
+
+--48p lead()
+SELECT ename, hiredate, sal,
+        LEAD(sal, 2,1) OVER(ORDER BY hiredate) LEAD
+FROM emp;
+
+-- rank
+SELECT RANK('SMITH') WITHIN GROUP (ORDER BY ename) "RANK"
+FROM emp;
+
+SELECT ename FROM emp ORDER BY ename;
+
+--전체 순위 보기 : RANK() OVER (ORDER BY 조건컬럼명 [ASC | DESC]
+SELECT empno, ename, sal,
+        RANK() OVER (ORDER BY sal) AS RANK_ASC,
+        RANK() OVER (ORDER BY sal DESC) AS RANK_DESC
+    FROM emp;    
+    
+SELECT empno, ename, sal,
+        RANK() OVER( ORDER BY sal DESC) RANK
+FROM emp
+WHERE deptno = 10;
+
+--p53 / PARTITION BY
+SELECT empno, ename, sal, deptno,
+        RANK() OVER(PARTITION BY deptno ORDER BY SAL) RANK
+FROM emp;
+
+SELECT empno, ename, sal, deptno,
+        RANK() OVER(PARTITION BY deptno, job ORDER BY sal DESC) RANK
+FROM emp;
+
+--p55 dense_rank
+SELECT empno, ename, sal,
+        RANK() OVER (ORDER BY sal DESC) sal_rank,
+        DENSE_RANK( ) OVER (ORDER BY sal DESC) sal_dense_rank
+FROM emp;
+
+--p56 ROW_NUMBER()
+--sal_rank -> 동점자 같은 등수 + 1등 두명인 경우 2등 없이 3등)
+--sal_dense_rank -> 동점자 같은 등수 + 공동 1등 다음은 2등
+--sal_row_num -> 동점자 없음.
+SELECT empno, ename, job, sal,
+        RANK() OVER (ORDER BY sal DESC) sal_rank,
+        DENSE_RANK() OVER (ORDER BY sal DESC) sal_dense_rank,
+        ROW_NUMBER() OVER (ORDER BY sal DESC) sal_row_num
+FROM emp;
+
+--sum() over
+SELECT p_date, p_code, p_qty, p_total,
+        SUM(p_total) OVER(ORDER BY p_total) TOTAL
+FROM panmae
+WHERE p_store = 1000;
+
+SELECT p_date, p_code, p_qty, p_total,
+        SUM(p_total) OVER(PARTITION BY p_code ORDER BY p_total) TOTAL
+FROM panmae
+WHERE p_store = 1000;
+
+SELECT p_code, p_store, p_date, p_qty, p_total,
+        SUM(p_total) OVER(PARTITION BY p_code, p_store ORDER BY p_date) TOTAL
+FROM panmae;
+
+--P60 RATIO_TO_REPORT()
+SELECT  p_code, SUM(SUM(p_qty)) OVER() TOTAL_QTY,
+        SUM(SUM(p_total)) OVER() TOTAL_PRICE,
+        p_store, p_qty, p_total,
+        ROUND((RATIO_TO_REPORT(SUM(p_qty)) OVER())*100,2) "qty_%",
+        ROUND((RATIO_TO_REPORT(SUM(p_total)) OVER())*100,2) "total_%"
+FROM panmae
+WHERE p_code=100
+GROUP BY p_code, p_store, p_qty, p_total;
+
+--p61 quiz1 - 못품
+SELECT * FROM emp;
+SELECT  MAX(SUM(sal+comm)) MAX,
+        MIN(SUM(sal+comm)) MIN,
+        AVG(MAX,MIN)
+FROM emp;
